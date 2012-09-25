@@ -1,0 +1,45 @@
+#!/bin/sh
+Run=/var/run/my-app.pid
+ProcName="myapp"
+ProcPath="/var/lib/my-app/"
+ProcStart="./appjsvc start"
+ProcStop="./appjsvc stop"
+export LANG="en_US.UTF-8"
+ulimit -n 8192
+case "$1" in
+        start)
+                if ! [ -e $Run ]; then
+                        cd $ProcPath
+                        $ProcStart
+                else
+                        echo "$ProcName already running!"
+                fi
+        ;;
+        stop)
+                if [ -e $Run ]; then
+                        cd $ProcPath
+                        $ProcStop
+                else
+                        echo "$ProcName not run!"
+                fi
+        ;;
+        status)
+                if ! [ -e $Run ]; then
+                        echo "$ProcName not run!"
+                else
+                        echo "$ProcName running!"
+                fi
+        ;;
+
+        restart)
+                cd $ProcPath
+                if [ -e $Run ]; then
+                        $ProcStop
+                fi
+                $ProcStart
+        ;;
+        *)
+        echo "Usage: $0 start|stop|status|restart"
+        ;;
+esac
+exit

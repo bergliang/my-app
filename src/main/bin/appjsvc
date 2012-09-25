@@ -1,0 +1,59 @@
+#!/bin/sh
+
+
+# myjsvc This shell script takes care of starting and stopping
+#
+# chkconfig: - 60 50
+# description: myapp maven daemon.
+# processname: myapp
+
+#ulimit -n8192
+
+RETVAL=0
+prog="myapp"
+ctijar=""
+
+export LANG=en_US.UTF-8
+for file in `ls -t lib/my-app*`;
+do
+        ctijar=$file
+        break
+done
+
+JAVA_HOME=/usr/local/lib/jdk1.6.0_07
+CLASSPATH=\
+.:$ctijar
+
+PID_FILE=/var/run/my-app.pid
+
+case "$1" in
+start)
+#
+# Start app Serivce
+#
+jsvc \
+-user root \
+-home $JAVA_HOME \
+-pidfile $PID_FILE \
+-outfile processinfo.log \
+-errfile processinfo.log \
+-cp $CLASSPATH \
+com.mycompany.app.JsvcMain
+exit $?
+;;
+
+stop)
+#
+# Stop app Serivce
+#
+jsvc \
+-stop \
+-pidfile $PID_FILE \
+com.mycompany.app.JsvcMain
+exit $?
+;;
+
+*)
+echo "Usage start start/stop"
+exit 1;;
+esac
